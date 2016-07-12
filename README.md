@@ -1,1 +1,1 @@
-# scratcch
+# Scratch for Ideas
