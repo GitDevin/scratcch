@@ -12,39 +12,60 @@
 
 <body>
 <div id="locationField">
-    <input id="autocomplete" placeholder="Enter your address"
-           onFocus="geolocate()" type="text"></input>
+    <input id="billing-autocomplete" placeholder="Enter your billing address" onFocus="geolocate(this.id)" type="text"></input>
 </div>
 
 <table id="address">
     <tr>
-        <td class="label">Street address</td>
-        <td class="slimField"><input class="field" id="street_number"
-                                     disabled="true"></input></td>
-        <td class="wideField" colspan="2"><input class="field" id="route"
-                                                 disabled="true"></input></td>
+        <td class="label-default" for="billing-street_number">Street address</td>
+        <td><input class="field" id="billing-street_number" disabled="true"></input></td>
+        <td colspan="2"><input class="field" id="billing-route" disabled="true"></input></td>
     </tr>
     <tr>
-        <td class="label">City</td>
-        <td class="wideField" colspan="3"><input class="field" id="locality"
-                                                 disabled="true"></input></td>
+        <td class="label-default" for="billing-locality">City</td>
+        <td colspan="3"><input class="field" id="billing-locality" disabled="true"></input></td>
     </tr>
     <tr>
-        <td class="label">State</td>
-        <td class="slimField"><input class="field"
-                                     id="administrative_area_level_1" disabled="true"></input></td>
-        <td class="label">Zip code</td>
-        <td class="wideField"><input class="field" id="postal_code"
-                                     disabled="true"></input></td>
+        <td class="label-default" for="billing-administrative_area_level_1">State</td>
+        <td><input class="field" id="billing-administrative_area_level_1" disabled="true"></input></td>
+        <td class="label-default" for="billing-postal_code">Zip code</td>
+        <td><input class="field" id="billing-postal_code" disabled="true"></input></td>
     </tr>
     <tr>
-        <td class="label">Country</td>
-        <td class="wideField" colspan="3"><input class="field"
-                                                 id="country" disabled="true"></input></td>
+        <td class="label-default" for="billing-country">Country</td>
+        <td colspan="3"><input class="field" id="billing-country" disabled="true"></input></td>
     </tr>
 </table>
 
-<script>
+<br/>
+
+<div id="locationField">
+    <input id="shipping-autocomplete" placeholder="Enter your shipping address" onFocus="geolocate(this.id)" type="text"></input>
+</div>
+
+<table id="address">
+    <tr>
+        <td class="label-default" for="shipping-street_number">Street address</td>
+        <td><input class="field" id="shipping-street_number" disabled="true"></input></td>
+        <td colspan="2"><input class="field" id="shipping-route" disabled="true"></input></td>
+    </tr>
+    <tr>
+        <td class="label-default" for="shipping-locality">City</td>
+        <td colspan="3"><input class="field" id="shipping-locality" disabled="true"></input></td>
+    </tr>
+    <tr>
+        <td class="label-default" for="shipping-administrative_area_level_1">State</td>
+        <td><input class="field" id="shipping-administrative_area_level_1" disabled="true"></input></td>
+        <td class="label-default" for="shipping-postal_code">Zip code</td>
+        <td><input class="field" id="shipping-postal_code" disabled="true"></input></td>
+    </tr>
+    <tr>
+        <td class="label-default" for="shipping-country">Country</td>
+        <td colspan="3"><input class="field" id="shipping-country" disabled="true"></input></td>
+    </tr>
+</table>
+
+<script type="text/javascript">
     // This example displays an address form, using the autocomplete feature
     // of the Google Places API to help users fill in the information.
 
@@ -52,7 +73,8 @@
     // parameter when you first load the API. For example:
     // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
 
-    var placeSearch, autocomplete;
+    var autocompletes = {};
+
     var componentForm = {
         street_number: 'short_name',
         route: 'long_name',
@@ -62,25 +84,35 @@
         postal_code: 'short_name'
     };
 
-    function initAutocomplete() {
-        // Create the autocomplete object, restricting the search to geographical
-        // location types.
-        autocomplete = new google.maps.places.Autocomplete(
-                /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
-                {types: ['geocode']});
+    autocompletes["billing"] = {};
+    autocompletes["shipping"] = {};
 
-        // When the user selects an address from the dropdown, populate the address
-        // fields in the form.
-        autocomplete.addListener('place_changed', fillInAddress);
+    function initAutocomplete() {
+        for (var key in autocompletes) {
+            // Create the autocomplete object, restricting the search to geographical
+            // location types.
+            autocompletes[key]["autocomplete"] = new google.maps.places.Autocomplete(
+                    /** @type {!HTMLInputElement} */
+                    (document.getElementById(key+'-autocomplete')),
+                    {types: ['geocode']});
+
+            // When the user selects an address from the dropdown, populate the address
+            // fields in the form.
+
+            google.maps.event.addListener(autocompletes[key]["autocomplete"], 'place_changed', function() {
+                fillInAddress("billing", autocompletes["billing"]["autocomplete"]);
+                fillInAddress("shipping", autocompletes["shipping"]["autocomplete"]);
+            });
+        }
     }
 
-    function fillInAddress() {
+    function fillInAddress(key) {
         // Get the place details from the autocomplete object.
-        var place = autocomplete.getPlace();
+        var place = autocompletes[key]["autocomplete"].getPlace();
 
         for (var component in componentForm) {
-            document.getElementById(component).value = '';
-            document.getElementById(component).disabled = false;
+            document.getElementById(key+"-"+component).value = "";
+            document.getElementById(key+"-"+component).disabled = false;
         }
 
         // Get each component of the address from the place details
@@ -89,14 +121,27 @@
             var addressType = place.address_components[i].types[0];
             if (componentForm[addressType]) {
                 var val = place.address_components[i][componentForm[addressType]];
-                document.getElementById(addressType).value = val;
+                document.getElementById(key+"-"+addressType).value = val;
+                if (addressType.localeCompare('street_number') == 0) {
+                    console.log('street_number: ' + val);
+                } else if (addressType.localeCompare('route') == 0) {
+                    console.log('route: ' + val);
+                } else if (addressType.localeCompare('locality') == 0) {
+                    console.log('locality: ' + val);
+                } else if (addressType.localeCompare('administrative_area_level_1') == 0) {
+                    console.log('administrative_area_level_1: ' + val);
+                } else if (addressType.localeCompare('country') == 0) {
+                    console.log('country: ' + val);
+                } else if (addressType.localeCompare('postal_code') == 0) {
+                    console.log('postal_code: ' + val);
+                }
             }
         }
     }
 
     // Bias the autocomplete object to the user's geographical location,
     // as supplied by the browser's 'navigator.geolocation' object.
-    function geolocate() {
+    function geolocate(key) {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var geolocation = {
@@ -107,12 +152,12 @@
                     center: geolocation,
                     radius: position.coords.accuracy
                 });
-                autocomplete.setBounds(circle.getBounds());
+                autocompletes[key]["autocomplete"].setBounds(circle.getBounds());
             });
         }
     }
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places&callback=initAutocomplete"
-        async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initAutocomplete"
+        defer></script>
 </body>
 </html>
