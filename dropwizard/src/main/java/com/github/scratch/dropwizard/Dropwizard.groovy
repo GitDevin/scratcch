@@ -30,6 +30,7 @@ class Dropwizard  extends Application<DropwizardConfiguration> {
 
     @Override
     void run(DropwizardConfiguration dropwizardConfiguration, Environment environment) throws Exception {
-        environment.jersey().register(new HomePageViewResources())
+        def googleAPIKey = dropwizardConfiguration.getGoogleAPIKey()
+        environment.jersey().register(new HomePageViewResources(googleAPIKey))
     }
 }

@@ -13,12 +13,17 @@ import javax.ws.rs.core.MediaType
  */
 @Path("/")
 class HomePageViewResources {
+    String googleAPIKey
+
+    public HomePageViewResources(String googleAPIKey) {
+        this.googleAPIKey = googleAPIKey
+    }
 
     @Timed
     @GET
     @Path("/")
     @Produces(MediaType.TEXT_HTML)
     public HomePageView getHomepage() {
-        return new HomePageView()
+        return new HomePageView(this.googleAPIKey)
     }
 }

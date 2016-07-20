@@ -11,7 +11,10 @@ class DropwizardConfiguration extends Configuration {
     @NotNull
     private Map<String, Map<String, String>> viewRendererConfiguration = new HashMap<>();
 
-    public Map<String, Map<String, String>> getViewRendererConfiguration() {
+    Map<String, Map<String, String>> getViewRendererConfiguration() {
         return this.viewRendererConfiguration
     }
+
+    @NotNull
+    String googleAPIKey
 }

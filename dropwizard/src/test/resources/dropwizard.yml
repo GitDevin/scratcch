@@ -1,3 +1,5 @@
+googleAPIKey:
+
 server:
   type: simple
   applicationContextPath: /

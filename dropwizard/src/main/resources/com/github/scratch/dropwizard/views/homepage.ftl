@@ -157,7 +157,7 @@
         }
     }
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initAutocomplete"
+<script src="https://maps.googleapis.com/maps/api/js?key=${getGoogleAPIKey()}&libraries=places&callback=initAutocomplete"
         defer></script>
 </body>
 </html>
