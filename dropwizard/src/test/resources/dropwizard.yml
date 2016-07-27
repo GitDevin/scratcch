@@ -6,7 +6,17 @@ server:
     type: http
     port: 8080
   requestLog:
-      timeZone: Australia/Sydney
+    timeZone: Australia/Sydney
+    appenders:
+      - type: console
+        target: stdout
+        timeZone: Australia/Sydney
+
+      - type: file
+        currentLogFilename: ./logs/dropwizard.log
+        archivedLogFilenamePattern: ./logs/dropwizard-%d.log.gz
+        archivedFileCount: 24
+        timeZone: Australia/Sydney
 
 viewRendererConfiguration:
   .ftl:

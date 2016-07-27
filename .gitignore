@@ -21,6 +21,7 @@ target/
 .project
 .settings/
 log/
+logs/
 coverage.db
 *.log
 *.log.gz
