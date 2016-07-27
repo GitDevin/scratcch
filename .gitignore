@@ -21,6 +21,7 @@ target/
 .project
 .settings/
 log/
+logs/
 coverage.db
 *.log
 *.log.gz
@@ -28,5 +29,3 @@ coverage.db
 output/
 
 dependency-reduced-pom.xml
-
-
