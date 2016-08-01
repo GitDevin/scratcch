@@ -6,7 +6,6 @@ server:
     type: http
     port: 8080
   requestLog:
-    timeZone: Australia/Sydney
     appenders:
       - type: console
         target: stdout
